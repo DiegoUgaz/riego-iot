@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualización de Datos</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom right, #2c3e50, #1f2b38);
+            color: #fff;
+            text-align: center;
+        }
+        h1 {
+            color: #3498db;
+        }
+        .dashboard-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+        .dashboard-section {
+            width: 45%;
+            margin: 10px;
+            padding: 20px;
+            background-color: #34495e;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .dashboard-section h2 {
+            color: #3498db;
+        }
+        .dashboard-section p {
+            font-size: 1.2em;
+        }
+        .thermometer {
+            position: relative;
+            width: 20px;
+            height: 100px;
+            margin: 20px auto;
+        }
+        .thermometer .bulb {
+            width: 20px;
+            height: 20px;
+            background-color: #ff0000;
+            border-radius: 50%;
+        }
+        .thermometer .tube {
+            width: 10px;
+            height: 80px;
+            background-color: #fff;
+            position: absolute;
+            top: 20px;
+            left: 5px;
+        }
+        .thermometer .filler {
+            width: 10px;
+            background-color: #ff0000;
+            position: absolute;
+            bottom: 0;
+        }
+    </style>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap">
+</head>
+<body>
+    <h1>Sistema de Riego</h1>
+    <div class="dashboard-container">
+        <div class="dashboard-section" id="section1">
+            <h2>Hora</h2>
+            <p id="dataHora">Esperando datos...</p>
+        </div>
+        <div class="dashboard-section" id="section3">
+            <h2>Temperatura</h2>
+            <div class="thermometer">
+                <div class="bulb"></div>
+                <div class="tube"></div>
+                <div class="filler" id="temperatureFiller"></div>
+            </div>
+            <p id="temperatura">Esperando datos...</p>
+        </div>
+        <div class="dashboard-section" id="section4">
+            <h2>Humedad</h2>
+            <p id="humedad">Esperando datos...</p>
+        </div>
+        <div class="dashboard-section" id="section5">
+            <h2>Humedad del Suelo</h2>
+            <p id="humedadTierra">Esperando datos...</p>
+        </div>
+    </div>
+    <audio id="alarmSound" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" preload="auto"></audio>
+    <script>
+        function updateThermometer(temperature) {
+            const maxTemperature = 30;
+            const fillerHeight = (temperature / maxTemperature) * 80;
+            document.getElementById('temperatureFiller').style.height = `${fillerHeight}px`;
+        }
+        function fetchData() {
+            fetch('/datos')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('dataHora').textContent = data.tiempo;
+                    document.getElementById('temperatura').textContent = `${data.temperatura} °C`;
+                    document.getElementById('humedad').textContent = `${data.humedad}%`;
+                    document.getElementById('humedadTierra').textContent = `${data.humedadPorcentaje}%`;
+                    updateThermometer(data.temperatura);
+                })
+                .catch(error => {
+                    console.error('Error al obtener datos:', error);
+                });
+        }
+        setInterval(fetchData, 1000);
+        fetchData();
+    </script>
+</body>
+</html>
+
